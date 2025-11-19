@@ -138,7 +138,7 @@ export const Sidebar: React.FC = () => {
                 <Settings size={20} />
                 <span className="ml-3 text-sm">Settings</span>
             </button>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-400 hover:text-white transition-colors">
+            <a href="https://github.com/Azratalib123" target="_blank" rel="noopener noreferrer" className="flex items-center text-gray-400 hover:text-white transition-colors">
                 <Github size={20} />
                 <span className="ml-3 text-sm">View on GitHub</span>
             </a>

@@ -1,19 +1,19 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { Loan, Client } from '../types';
 
-declare var process: {
-  env: {
-    API_KEY: string;
-  }
-};
+// Ensure we use the API key from process.env as required.
+// In Vite/Browser environments, accessing 'process' directly can sometimes fail if not polyfilled.
+// We use a safe access pattern or rely on the build tool replacement.
+const apiKey = process.env.API_KEY;
 
 export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Client[]): Promise<string> => {
   try {
-    if (!process.env.API_KEY) {
+    if (!apiKey) {
         return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI-powered suggestions.";
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey });
     const totalLoans = loans.length;
     const activeLoans = loans.filter(l => l.status === 'Active').length;
     const highRiskClients = clients.filter(c => c.riskLevel === 'High').length;
@@ -49,11 +49,11 @@ export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Cl
 
 export const getRiskScoreExplanation = async (client: Client): Promise<string> => {
     try {
-        if (!process.env.API_KEY) {
+        if (!apiKey) {
              return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI features.";
         }
 
-        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+        const ai = new GoogleGenAI({ apiKey });
         const { name, previousLoans, missedPayments, cnicVerified, riskScore } = client;
 
         const prompt = `

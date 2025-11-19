@@ -201,6 +201,7 @@ export const SettingsPage: React.FC = () => {
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
 
     // Local Settings State
     const [localGlobalSettings, setLocalGlobalSettings] = useState(globalSettings);
@@ -255,6 +256,16 @@ export const SettingsPage: React.FC = () => {
         setLocalGlobalSettings(globalSettings);
         setLocalAppSettings(appSettings);
     }, [globalSettings, appSettings]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsMobileMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     const [passwords, setPasswords] = useState({
         current: '',
@@ -1078,21 +1089,28 @@ export const SettingsPage: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col md:flex-row h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="flex flex-col md:flex-row h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 relative overflow-hidden md:overflow-visible">
+            
             {/* Mobile Header (Visible only on small screens) */}
-            <div className="md:hidden p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{getCurrentSectionLabel()}</h2>
-                <div className="relative">
+            <div className="md:hidden flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 z-20 relative shrink-0">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                     <span className="text-indigo-600">{SETTINGS_SECTIONS.find(s => s.id === activeSection)?.icon}</span>
+                     {getCurrentSectionLabel()}
+                </h2>
+                <div ref={menuRef}>
                     <button 
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300"
                     >
-                        <MoreVertical size={20} className="text-gray-600 dark:text-gray-300" />
+                        <MoreVertical size={24} />
                     </button>
                     
                     {/* Dropdown Menu */}
                     {isMobileMenuOpen && (
-                        <div className="absolute right-0 top-12 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 py-1">
+                        <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 py-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                             <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 mb-2">
+                                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Settings Menu</p>
+                             </div>
                             {SETTINGS_SECTIONS.map((section) => (
                                 <button
                                     key={section.id}
@@ -1100,7 +1118,7 @@ export const SettingsPage: React.FC = () => {
                                         setActiveSection(section.id);
                                         setIsMobileMenuOpen(false);
                                     }}
-                                    className={`w-full text-left px-4 py-3 text-sm flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                                    className={`w-full text-left px-4 py-3 text-sm flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
                                         activeSection === section.id 
                                         ? 'text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/10' 
                                         : 'text-gray-700 dark:text-gray-300'
@@ -1108,6 +1126,7 @@ export const SettingsPage: React.FC = () => {
                                 >
                                     {section.icon}
                                     <span>{section.label}</span>
+                                    {activeSection === section.id && <CheckCircle size={14} className="ml-auto text-indigo-600" />}
                                 </button>
                             ))}
                         </div>
@@ -1116,7 +1135,7 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             {/* Desktop Sidebar (Hidden on mobile) */}
-            <div className="hidden md:block w-64 bg-gray-50 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+            <div className="hidden md:flex w-64 flex-col bg-gray-50 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto h-full shrink-0">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 px-2">Settings</h2>
                 <div className="space-y-1">
                     {SETTINGS_SECTIONS.map((section) => (
@@ -1133,13 +1152,13 @@ export const SettingsPage: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
+            <div className="flex-1 flex flex-col overflow-hidden relative z-0 bg-white dark:bg-gray-800 min-h-0">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8 scroll-smooth">
                     {renderContent()}
                 </div>
                 
                 {activeSection !== 'roles' && (
-                    <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-end items-center space-x-4">
+                    <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-end items-center space-x-4 shrink-0">
                         {error && (
                             <div className="text-red-600 text-sm font-medium flex items-center">
                                 <AlertCircle size={16} className="mr-1" />
