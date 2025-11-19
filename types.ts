@@ -35,10 +35,10 @@ export interface Client {
   maritalStatus: 'Single' | 'Married' | 'Divorced' | 'Widowed';
   occupation: string;
   secondaryPhone?: string;
-  monthlyIncome: number; // Added for Eligibility
-  cnicFrontImage?: string; // Added for KYC
-  cnicBackImage?: string; // Added for KYC
-  selfieImage?: string; // Added for KYC
+  monthlyIncome: number; 
+  cnicFrontImage?: string; 
+  cnicBackImage?: string; 
+  selfieImage?: string; 
   previousLoans: number;
   missedPayments: number;
   riskLevel: RiskLevel;
@@ -55,7 +55,7 @@ export interface Repayment {
   interest: number;
   remainingBalance: number;
   status: RepaymentStatus;
-  paidAt?: Date; // Added for reporting
+  paidAt?: Date;
 }
 
 export interface LoanFee {

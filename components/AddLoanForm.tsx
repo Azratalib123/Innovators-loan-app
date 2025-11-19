@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useLoanManager } from '../hooks/useLoanManager';
 import { NewLoanData, LoanFee, LoanStatus, Repayment } from '../types';
 import { generateInstallmentSchedule, calculateMaxLoanEligibility, calculateMLRiskScore, scoreToRiskLevel } from '../utils/loanCalculations';
-import { Plus, X, Trash2, Calendar, AlertCircle, Download, Loader2 } from 'lucide-react';
+import { Plus, X, Trash2, Calendar, AlertCircle, Download, Loader2, RefreshCw } from 'lucide-react';
 
 const RiskGauge: React.FC<{ score: number }> = ({ score }) => {
     const angle = score * 180;
@@ -41,6 +41,7 @@ export const AddLoanForm: React.FC = () => {
     const [calculatedRisk, setCalculatedRisk] = useState(0);
     const [eligibilityLimit, setEligibilityLimit] = useState(0);
     const [schedule, setSchedule] = useState<Repayment[]>([]);
+    const [isCalculating, setIsCalculating] = useState(false);
 
     useEffect(() => {
         if(clientId) {
@@ -67,6 +68,21 @@ export const AddLoanForm: React.FC = () => {
         const newSchedule = generateInstallmentSchedule(loanData);
         setSchedule(newSchedule);
     }, [amount, duration, interestRate, startDate]);
+
+    const handleRecalculateRisk = () => {
+        setIsCalculating(true);
+        // Simulate calculation delay
+        setTimeout(() => {
+             if(clientId) {
+                const client = clients.find(c => c.id === clientId);
+                if(client) {
+                    const risk = calculateMLRiskScore(client);
+                    setCalculatedRisk(risk);
+                }
+            }
+            setIsCalculating(false);
+        }, 800);
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -183,7 +199,17 @@ export const AddLoanForm: React.FC = () => {
             <div className="w-full lg:w-96 space-y-6">
                 {clientId ? (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                        <h3 className="text-lg font-bold mb-4 dark:text-white">Risk Assessment</h3>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-bold dark:text-white">Risk Assessment</h3>
+                            <button 
+                                onClick={handleRecalculateRisk}
+                                disabled={isCalculating}
+                                className="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 transition-colors"
+                                title="Recalculate Score"
+                            >
+                                <RefreshCw size={16} className={isCalculating ? 'animate-spin' : ''} />
+                            </button>
+                        </div>
                         <RiskGauge score={calculatedRisk} />
                         <div className="text-center">
                             <p className="text-2xl font-bold dark:text-white">{(calculatedRisk * 100).toFixed(1)}%</p>

@@ -31,7 +31,7 @@ export const AddLoanProductForm: React.FC = () => {
     // Fees
     const [fees, setFees] = useState<LoanFee[]>([]);
     const [isFeeModalOpen, setIsFeeModalOpen] = useState(false);
-    const [newFee, setNewFee] = useState<Partial<LoanFee>>({ name: '', type: 'Percentage Based', value: 0 });
+    const [newFee, setNewFee] = useState<Partial<LoanFee>>({ name: '', type: 'Percentage Based', value: 0, isDeductible: false });
 
     // Documents
     const [documents, setDocuments] = useState<File[]>([]);
@@ -110,7 +110,7 @@ export const AddLoanProductForm: React.FC = () => {
         if (newFee.name && newFee.value) {
             setFees([...fees, { ...newFee, id: Date.now().toString() } as LoanFee]);
             setIsFeeModalOpen(false);
-            setNewFee({ name: '', type: 'Percentage Based', value: 0 });
+            setNewFee({ name: '', type: 'Percentage Based', value: 0, isDeductible: false });
         }
     };
 
@@ -528,6 +528,18 @@ export const AddLoanProductForm: React.FC = () => {
                                     onChange={e => setNewFee({...newFee, value: parseFloat(e.target.value)})}
                                     className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600 text-black dark:text-white"
                                 />
+                            </div>
+                            <div className="flex items-center">
+                                <input 
+                                    type="checkbox" 
+                                    id="isDeductible"
+                                    checked={newFee.isDeductible}
+                                    onChange={e => setNewFee({...newFee, isDeductible: e.target.checked})}
+                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor="isDeductible" className="ml-2 block text-sm text-gray-900 dark:text-gray-300">
+                                    Deduct from Principal?
+                                </label>
                             </div>
                         </div>
                         <div className="flex justify-end mt-6 space-x-3">

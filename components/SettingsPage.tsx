@@ -281,7 +281,6 @@ export const SettingsPage: React.FC = () => {
             } else if (activeSection === 'loanConfig') {
                 updateGlobalSettings(localGlobalSettings);
             } else {
-                // Save other sections using updateAppSettings
                 updateAppSettings(localAppSettings);
             }
 
@@ -1054,7 +1053,6 @@ export const SettingsPage: React.FC = () => {
 
     return (
         <div className="flex h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            {/* Sidebar Navigation */}
             <div className="w-64 bg-gray-50 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 px-2">Settings</h2>
                 <div className="space-y-1">
@@ -1069,14 +1067,11 @@ export const SettingsPage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Main Content Area */}
             <div className="flex-1 flex flex-col">
                 <div className="flex-1 p-8 overflow-y-auto">
                     {renderContent()}
                 </div>
                 
-                {/* Footer Action */}
-                {/* Hide Save button for Roles section as it has its own internal saving mechanism */}
                 {activeSection !== 'roles' && (
                     <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-end items-center space-x-4">
                         {error && (

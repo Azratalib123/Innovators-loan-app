@@ -12,7 +12,7 @@ interface LoanContextType {
   activityLog: ActivityLogItem[];
   collections: Collection[];
   globalSettings: GlobalLoanSettings;
-  appSettings: AppSettings; // Added
+  appSettings: AppSettings;
   
   addClient: (clientData: NewClientData) => void;
   updateClient: (client: Client) => void;
@@ -23,7 +23,7 @@ interface LoanContextType {
   markRepaymentAsPaid: (loanId: string, installmentNo: number) => void;
   addCollection: (data: Omit<Collection, 'id' | 'collectedAt' | 'collectedBy'>) => void;
   updateGlobalSettings: (settings: GlobalLoanSettings) => void;
-  updateAppSettings: (settings: AppSettings) => void; // Added
+  updateAppSettings: (settings: AppSettings) => void;
 
   getClientById: (clientId: string) => Client | undefined;
   updateClientVerificationStatus: (clientId: string, isVerified: boolean) => void;
@@ -48,7 +48,7 @@ interface LoanContextType {
   addRole: (role: Role) => void;
   updateRole: (role: Role) => void;
   updateSystemUser: (user: SystemUser) => void;
-  inviteSystemUser: (email: string, name: string, roleId: string) => void; // Added
+  inviteSystemUser: (email: string, name: string, roleId: string) => void;
   
   // Helpers
   exportData: (type: 'clients' | 'loans' | 'backup') => void;
@@ -60,7 +60,6 @@ const LoanContext = createContext<LoanContextType | undefined>(undefined);
 const MOCK_PERMISSIONS: Permission[] = [
     { id: 'p1', name: 'View Loans', description: 'Can view loan list and details', category: 'Loans' },
     { id: 'p2', name: 'Create Loan', description: 'Can initiate new loan applications', category: 'Loans' },
-    // ... others are implied for now
 ];
 
 const MOCK_ROLES: Role[] = [
@@ -619,7 +618,7 @@ export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         activityLog,
         collections,
         globalSettings,
-        appSettings, // Added
+        appSettings,
         addClient,
         updateClient,
         addLoan, 
@@ -629,7 +628,7 @@ export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         markRepaymentAsPaid,
         addCollection,
         updateGlobalSettings,
-        updateAppSettings, // Added
+        updateAppSettings,
         getClientById,
         updateClientVerificationStatus,
         currentView,
@@ -648,7 +647,7 @@ export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         addRole,
         updateRole,
         updateSystemUser,
-        inviteSystemUser, // Added
+        inviteSystemUser,
         exportData
     }}>
       {children}
