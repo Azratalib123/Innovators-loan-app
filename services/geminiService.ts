@@ -1,10 +1,8 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Loan, Client } from '../types';
 
 // Ensure we use the API key from process.env as required.
-// In Vite/Browser environments, accessing 'process' directly can sometimes fail if not polyfilled.
-// We use a safe access pattern or rely on the build tool replacement.
 const apiKey = process.env.API_KEY;
 
 export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Client[]): Promise<string> => {
@@ -13,7 +11,9 @@ export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Cl
         return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI-powered suggestions.";
     }
 
-    const ai = new GoogleGenAI({ apiKey });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
     const totalLoans = loans.length;
     const activeLoans = loans.filter(l => l.status === 'Active').length;
     const highRiskClients = clients.filter(c => c.riskLevel === 'High').length;
@@ -36,11 +36,9 @@ export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Cl
       Format the response in markdown. Use headings for each category.
     `;
     
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    });
-    return response.text || "No suggestions generated.";
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return response.text() || "No suggestions generated.";
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return "An error occurred while fetching AI suggestions. Please check the console for details.";
@@ -53,7 +51,9 @@ export const getRiskScoreExplanation = async (client: Client): Promise<string> =
              return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI features.";
         }
 
-        const ai = new GoogleGenAI({ apiKey });
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
         const { name, previousLoans, missedPayments, cnicVerified, riskScore } = client;
 
         const prompt = `
@@ -73,11 +73,9 @@ export const getRiskScoreExplanation = async (client: Client): Promise<string> =
             - Format the response in markdown.
         `;
     
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
-        });
-        return response.text || "No explanation generated.";
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text() || "No explanation generated.";
     } catch (error) {
         console.error("Error calling Gemini API for risk explanation:", error);
         return "An error occurred while generating the risk explanation.";
