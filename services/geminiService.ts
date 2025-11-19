@@ -1,8 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Loan, Client } from '../types';
 
-// Access the API key safely. Vite replaces import.meta.env.VITE_GOOGLE_API_KEY with the actual string value during build.
-const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || '';
+// Access the API key safely. We check if import.meta.env exists before accessing the key.
+const API_KEY = (import.meta.env && import.meta.env.VITE_GOOGLE_API_KEY) ? import.meta.env.VITE_GOOGLE_API_KEY : '';
 
 if (!API_KEY) {
   console.warn("VITE_GOOGLE_API_KEY environment variable not set. Gemini features will be disabled.");

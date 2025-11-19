@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
@@ -15,6 +15,7 @@ import { ClientDetailsView } from './components/ClientDetailsView';
 import { SettingsPage } from './components/SettingsPage';
 import { Collections } from './components/Collections';
 import { Reports } from './components/Reports';
+import { WelcomePage } from './components/WelcomePage';
 
 const AppContent: React.FC = () => {
   const { currentView, selectedLoan, setSelectedLoan } = useLoanManager();
@@ -64,6 +65,12 @@ const AppContent: React.FC = () => {
 
 
 export default function App() {
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  if (showWelcome) {
+    return <WelcomePage onStart={() => setShowWelcome(false)} />;
+  }
+
   return (
     <LoanProvider>
       <AppContent />

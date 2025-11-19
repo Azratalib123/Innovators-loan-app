@@ -69,13 +69,13 @@ export const Header: React.FC = () => {
   const loanResults = results.filter((r): r is { type: 'loan'; data: Loan } => r.type === 'loan');
 
   return (
-    <header className="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-      <div className="flex items-center">
-        <div className="relative" ref={searchContainerRef}>
+    <header className="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 mt-16 md:mt-0 transition-all">
+      <div className="flex items-center w-full md:w-auto">
+        <div className="relative w-full md:w-auto" ref={searchContainerRef}>
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search clients, loans..."
+            placeholder="Search..."
             className="w-full sm:w-64 pl-10 pr-4 py-2 text-sm text-gray-700 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
                        <li key={res.data.id} onClick={() => handleClientClick(res.data)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <ClientIcon className="h-4 w-4 mr-3 text-gray-400"/>
                           <div>
-                            <p className="text-sm font-medium">{res.data.name}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{res.data.name}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{res.data.cnic}</p>
                           </div>
                        </li>
@@ -107,7 +107,7 @@ export const Header: React.FC = () => {
                        <li key={res.data.id} onClick={() => handleLoanClick(res.data)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <LoanIcon className="h-4 w-4 mr-3 text-gray-400"/>
                           <div>
-                            <p className="text-sm font-medium">{res.data.clientName}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{res.data.clientName}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               ${res.data.loanAmount.toLocaleString()} - {res.data.loanType}
                             </p>
@@ -121,7 +121,7 @@ export const Header: React.FC = () => {
           )}
         </div>
       </div>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-4 ml-4">
         <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
           <Bell className="h-6 w-6 text-gray-500 dark:text-gray-400" />
         </button>
