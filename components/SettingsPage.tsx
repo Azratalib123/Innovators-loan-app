@@ -129,6 +129,18 @@ const PasswordInput: React.FC<{
 };
 
 const getCurrentSessionInfo = (): ActiveSession => {
+    if (typeof navigator === 'undefined') {
+        return {
+            id: 'current-session',
+            deviceType: 'Desktop',
+            deviceName: 'Unknown',
+            location: 'Unknown',
+            ipAddress: 'Unknown',
+            lastActive: new Date(),
+            isCurrent: true
+        };
+    }
+
     const userAgent = navigator.userAgent;
     let deviceName = "Unknown Device";
     let deviceType: 'Desktop' | 'Mobile' | 'Tablet' = 'Desktop';

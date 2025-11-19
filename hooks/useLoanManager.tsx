@@ -232,8 +232,17 @@ export const LoanProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [filteredClientId, setFilteredClientId] = useState<string | null>(null);
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => {
-      const saved = localStorage.getItem('userProfile');
-      return saved ? JSON.parse(saved) : {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('userProfile');
+        return saved ? JSON.parse(saved) : {
+            firstName: 'Admin',
+            lastName: 'User',
+            email: 'admin@lendbox.io',
+            phone: '+1 (555) 123-4567',
+            avatar: null
+        };
+      }
+      return {
           firstName: 'Admin',
           lastName: 'User',
           email: 'admin@lendbox.io',

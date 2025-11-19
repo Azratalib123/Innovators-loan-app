@@ -65,8 +65,8 @@ export const Header: React.FC = () => {
     setShowResults(false);
   };
 
-  const clientResults = results.filter(r => r.type === 'client');
-  const loanResults = results.filter(r => r.type === 'loan');
+  const clientResults = results.filter((r): r is { type: 'client'; data: Client } => r.type === 'client');
+  const loanResults = results.filter((r): r is { type: 'loan'; data: Loan } => r.type === 'loan');
 
   return (
     <header className="flex items-center justify-between h-16 px-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -88,11 +88,11 @@ export const Header: React.FC = () => {
                   <h3 className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase border-b dark:border-gray-700">Clients</h3>
                   <ul>
                     {clientResults.map(res => (
-                       <li key={res.data.id} onClick={() => handleClientClick(res.data as Client)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                       <li key={res.data.id} onClick={() => handleClientClick(res.data)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <ClientIcon className="h-4 w-4 mr-3 text-gray-400"/>
                           <div>
                             <p className="text-sm font-medium">{res.data.name}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{(res.data as Client).cnic}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{res.data.cnic}</p>
                           </div>
                        </li>
                     ))}
@@ -104,12 +104,12 @@ export const Header: React.FC = () => {
                   <h3 className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase border-b dark:border-gray-700">Loans</h3>
                   <ul>
                   {loanResults.map(res => (
-                       <li key={res.data.id} onClick={() => handleLoanClick(res.data as Loan)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                       <li key={res.data.id} onClick={() => handleLoanClick(res.data)} className="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
                           <LoanIcon className="h-4 w-4 mr-3 text-gray-400"/>
                           <div>
                             <p className="text-sm font-medium">{res.data.clientName}</p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              ${(res.data as Loan).loanAmount.toLocaleString()} - {(res.data as Loan).loanType}
+                              ${res.data.loanAmount.toLocaleString()} - {res.data.loanType}
                             </p>
                           </div>
                        </li>
