@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { User, Settings, DollarSign, Bell, Shield, Database, Globe, Briefcase, Layers, Lock, Palette, Save, Sliders, Camera, Check, Eye, EyeOff, AlertCircle, Plus, Edit2, Trash2, Search, CheckCircle, XCircle, Smartphone, Monitor, LogOut, Laptop } from 'lucide-react';
+import { User, Settings, DollarSign, Bell, Shield, Database, Globe, Briefcase, Layers, Lock, Palette, Save, Sliders, Camera, Check, Eye, EyeOff, AlertCircle, Plus, Edit2, Trash2, Search, CheckCircle, XCircle, Smartphone, Monitor, LogOut, Laptop, MoreVertical } from 'lucide-react';
 import { useLoanManager } from '../hooks/useLoanManager';
 import { Role, Permission, SystemUser, AppSettings } from '../types';
 
@@ -26,6 +26,18 @@ const MOCK_PERMISSIONS: Permission[] = [
     { id: 'p9', name: 'Export Data', description: 'Can export data to CSV/Excel', category: 'Reports' },
     { id: 'p10', name: 'Manage Settings', description: 'Can access global settings', category: 'Settings' },
     { id: 'p11', name: 'Manage Roles', description: 'Can create and assign roles', category: 'System' },
+];
+
+// --- Sections Configuration ---
+const SETTINGS_SECTIONS: { id: SettingSection; label: string; icon: React.ReactNode }[] = [
+    { id: 'profile', label: 'User Profile', icon: <User size={18} /> },
+    { id: 'loanConfig', label: 'Loan Configuration', icon: <Sliders size={18} /> },
+    { id: 'finance', label: 'Currency & Finance', icon: <DollarSign size={18} /> },
+    { id: 'notifications', label: 'Notifications', icon: <Bell size={18} /> },
+    { id: 'roles', label: 'Roles & Permissions', icon: <Shield size={18} /> },
+    { id: 'security', label: 'Security Controls', icon: <Lock size={18} /> },
+    { id: 'backup', label: 'Data Backup', icon: <Database size={18} /> },
+    { id: 'integrations', label: 'Integrations', icon: <Layers size={18} /> },
 ];
 
 // --- Session Types ---
@@ -188,6 +200,7 @@ export const SettingsPage: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Local Settings State
     const [localGlobalSettings, setLocalGlobalSettings] = useState(globalSettings);
@@ -478,12 +491,12 @@ export const SettingsPage: React.FC = () => {
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
                     <div>
                         <h3 className="text-lg font-medium text-gray-900 dark:text-white">Roles & Permissions</h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage system access levels and user assignments.</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Manage system access levels.</p>
                     </div>
-                    <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+                    <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 self-start">
                         <button 
                             onClick={() => setActiveRoleTab('roles')}
                             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeRoleTab === 'roles' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
@@ -494,13 +507,13 @@ export const SettingsPage: React.FC = () => {
                              onClick={() => setActiveRoleTab('users')}
                              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeRoleTab === 'users' ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
                         >
-                            User Assignments
+                            Assignments
                         </button>
                     </div>
                 </div>
 
                 {activeRoleTab === 'roles' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         {roles.map(role => (
                             <div key={role.id} onClick={() => handleEditRole(role)} className="group bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:shadow-md transition-all">
                                 <div className="flex justify-between items-start mb-4">
@@ -515,9 +528,9 @@ export const SettingsPage: React.FC = () => {
                                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">{role.description}</p>
                                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                                        <span className="font-bold">{role.usersCount || systemUsers.filter(u=>u.roleId===role.id).length}</span> Users assigned
+                                        <span className="font-bold">{role.usersCount || systemUsers.filter(u=>u.roleId===role.id).length}</span> Users
                                     </div>
-                                    <span className="text-indigo-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">Edit Permissions →</span>
+                                    <span className="text-indigo-600 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">Edit →</span>
                                 </div>
                             </div>
                         ))}
@@ -528,8 +541,8 @@ export const SettingsPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-800">
-                            <div className="relative w-72">
+                        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between bg-gray-50 dark:bg-gray-800 gap-4">
+                            <div className="relative w-full sm:w-72">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <input 
                                     type="text" 
@@ -539,18 +552,18 @@ export const SettingsPage: React.FC = () => {
                                     className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 text-black dark:text-white outline-none focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
-                            <div className="flex space-x-3">
+                            <div className="flex space-x-3 w-full sm:w-auto">
                                 <button 
                                     onClick={() => exportData('backup')} 
-                                    className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200"
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200"
                                 >
-                                    Export List
+                                    Export
                                 </button>
                                 <button 
                                     onClick={handleInviteUser}
-                                    className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
+                                    className="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700"
                                 >
-                                    Invite User
+                                    Invite
                                 </button>
                             </div>
                         </div>
@@ -561,8 +574,7 @@ export const SettingsPage: React.FC = () => {
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Branch</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -572,12 +584,12 @@ export const SettingsPage: React.FC = () => {
                                         <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-sm">
+                                                    <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold text-xs">
                                                         {user.name.charAt(0)}
                                                     </div>
-                                                    <div className="ml-4">
+                                                    <div className="ml-3">
                                                         <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
-                                                        <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -585,7 +597,7 @@ export const SettingsPage: React.FC = () => {
                                                 <select 
                                                     value={user.roleId}
                                                     onChange={(e) => changeUserRole(user.id, e.target.value)}
-                                                    className="block w-full pl-3 pr-10 py-1 text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                                                    className="block w-full pl-2 pr-8 py-1 text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
                                                 >
                                                     {roles.map(role => (
                                                         <option key={role.id} value={role.id}>{role.name}</option>
@@ -595,17 +607,14 @@ export const SettingsPage: React.FC = () => {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <button 
                                                     onClick={() => toggleUserStatus(user.id)}
-                                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium cursor-pointer ${user.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}
+                                                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium cursor-pointer ${user.status === 'Active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'}`}
                                                 >
-                                                    {user.status === 'Active' ? <CheckCircle size={12} className="mr-1" /> : <XCircle size={12} className="mr-1" />}
+                                                    {user.status === 'Active' ? <CheckCircle size={10} className="mr-1" /> : <XCircle size={10} className="mr-1" />}
                                                     {user.status}
                                                 </button>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                {user.branch || 'Head Office'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                {user.lastLogin.toLocaleDateString()}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
+                                                {user.branch || 'HQ'}
                                             </td>
                                         </tr>
                                     ))}
@@ -969,7 +978,7 @@ export const SettingsPage: React.FC = () => {
                             <div>
                                 <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3 uppercase">Export Data</h4>
                                 <p className="text-xs text-gray-500 mb-4">Download a copy of your data in CSV or JSON format.</p>
-                                <div className="flex space-x-4">
+                                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
                                     <button 
                                         onClick={() => exportData('clients')}
                                         className="px-4 py-2 bg-white border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -1063,29 +1072,74 @@ export const SettingsPage: React.FC = () => {
         }
     };
 
+    const getCurrentSectionLabel = () => {
+        const section = SETTINGS_SECTIONS.find(s => s.id === activeSection);
+        return section ? section.label : 'Settings';
+    }
+
     return (
-        <div className="flex h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div className="w-64 bg-gray-50 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 px-2">Settings</h2>
-                <div className="space-y-1">
-                    <SectionButton id="profile" label="User Profile" icon={<User size={18} />} active={activeSection === 'profile'} onClick={() => setActiveSection('profile')} />
-                    <SectionButton id="loanConfig" label="Loan Configuration" icon={<Sliders size={18} />} active={activeSection === 'loanConfig'} onClick={() => setActiveSection('loanConfig')} />
-                    <SectionButton id="finance" label="Currency & Finance" icon={<DollarSign size={18} />} active={activeSection === 'finance'} onClick={() => setActiveSection('finance')} />
-                    <SectionButton id="notifications" label="Notifications" icon={<Bell size={18} />} active={activeSection === 'notifications'} onClick={() => setActiveSection('notifications')} />
-                    <SectionButton id="roles" label="Roles & Permissions" icon={<Shield size={18} />} active={activeSection === 'roles'} onClick={() => setActiveSection('roles')} />
-                    <SectionButton id="security" label="Security Controls" icon={<Lock size={18} />} active={activeSection === 'security'} onClick={() => setActiveSection('security')} />
-                    <SectionButton id="backup" label="Data Backup" icon={<Database size={18} />} active={activeSection === 'backup'} onClick={() => setActiveSection('backup')} />
-                    <SectionButton id="integrations" label="Integrations" icon={<Layers size={18} />} active={activeSection === 'integrations'} onClick={() => setActiveSection('integrations')} />
+        <div className="flex flex-col md:flex-row h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Mobile Header (Visible only on small screens) */}
+            <div className="md:hidden p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{getCurrentSectionLabel()}</h2>
+                <div className="relative">
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        <MoreVertical size={20} className="text-gray-600 dark:text-gray-300" />
+                    </button>
+                    
+                    {/* Dropdown Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="absolute right-0 top-12 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 py-1">
+                            {SETTINGS_SECTIONS.map((section) => (
+                                <button
+                                    key={section.id}
+                                    onClick={() => {
+                                        setActiveSection(section.id);
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className={`w-full text-left px-4 py-3 text-sm flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                                        activeSection === section.id 
+                                        ? 'text-indigo-600 dark:text-indigo-400 font-medium bg-indigo-50 dark:bg-indigo-900/10' 
+                                        : 'text-gray-700 dark:text-gray-300'
+                                    }`}
+                                >
+                                    {section.icon}
+                                    <span>{section.label}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            <div className="flex-1 flex flex-col">
-                <div className="flex-1 p-8 overflow-y-auto">
+            {/* Desktop Sidebar (Hidden on mobile) */}
+            <div className="hidden md:block w-64 bg-gray-50 dark:bg-gray-800/50 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-6 px-2">Settings</h2>
+                <div className="space-y-1">
+                    {SETTINGS_SECTIONS.map((section) => (
+                        <SectionButton 
+                            key={section.id}
+                            id={section.id} 
+                            label={section.label} 
+                            icon={section.icon} 
+                            active={activeSection === section.id} 
+                            onClick={() => setActiveSection(section.id)} 
+                        />
+                    ))}
+                </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="flex-1 p-4 sm:p-8 overflow-y-auto">
                     {renderContent()}
                 </div>
                 
                 {activeSection !== 'roles' && (
-                    <div className="p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-end items-center space-x-4">
+                    <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex justify-end items-center space-x-4">
                         {error && (
                             <div className="text-red-600 text-sm font-medium flex items-center">
                                 <AlertCircle size={16} className="mr-1" />

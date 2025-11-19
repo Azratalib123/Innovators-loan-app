@@ -1,21 +1,19 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import { Loan, Client } from '../types';
 
-// Access the API key safely. We check if import.meta.env exists before accessing the key.
-const API_KEY = (import.meta.env && import.meta.env.VITE_GOOGLE_API_KEY) ? import.meta.env.VITE_GOOGLE_API_KEY : '';
-
-if (!API_KEY) {
-  console.warn("VITE_GOOGLE_API_KEY environment variable not set. Gemini features will be disabled.");
-}
-
-const genAI = new GoogleGenerativeAI(API_KEY);
+declare var process: {
+  env: {
+    API_KEY: string;
+  }
+};
 
 export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Client[]): Promise<string> => {
-    if (!API_KEY) {
-      return "Gemini API key is not configured. Please set the VITE_GOOGLE_API_KEY environment variable to enable AI-powered suggestions.";
+  try {
+    if (!process.env.API_KEY) {
+        return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI-powered suggestions.";
     }
 
-  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const totalLoans = loans.length;
     const activeLoans = loans.filter(l => l.status === 'Active').length;
     const highRiskClients = clients.filter(c => c.riskLevel === 'High').length;
@@ -38,9 +36,11 @@ export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Cl
       Format the response in markdown. Use headings for each category.
     `;
     
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+    });
+    return response.text || "No suggestions generated.";
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return "An error occurred while fetching AI suggestions. Please check the console for details.";
@@ -48,11 +48,12 @@ export const getSystemImprovementSuggestions = async (loans: Loan[], clients: Cl
 };
 
 export const getRiskScoreExplanation = async (client: Client): Promise<string> => {
-    if (!API_KEY) {
-      return "Gemini API key is not configured. Please set the VITE_GOOGLE_API_KEY environment variable to enable AI features.";
-    }
-
     try {
+        if (!process.env.API_KEY) {
+             return "Gemini API key is not configured. Please set the process.env.API_KEY environment variable to enable AI features.";
+        }
+
+        const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
         const { name, previousLoans, missedPayments, cnicVerified, riskScore } = client;
 
         const prompt = `
@@ -72,9 +73,11 @@ export const getRiskScoreExplanation = async (client: Client): Promise<string> =
             - Format the response in markdown.
         `;
     
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        const result = await model.generateContent(prompt);
-        return result.response.text();
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: prompt,
+        });
+        return response.text || "No explanation generated.";
     } catch (error) {
         console.error("Error calling Gemini API for risk explanation:", error);
         return "An error occurred while generating the risk explanation.";
